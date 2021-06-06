@@ -1,23 +1,17 @@
-name: "CD: Crosspost Changelog"
-on:
+name: Release messages to discord announcement channel
+
+on: 
   release:
-    types: [published]
+    types:
+      - created
+
 jobs:
-  crosspost:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
+  run_main:
+    runs-on: ubuntu-18.04
+    name: Sends custom message
     steps:
-    - name: "Parse release name"
-      id: get-release-name
-      run: "echo ::set-output name=name::${RELEASE:-$TAG}"
-      env:
-        RELEASE: ${{ github.event.release.name }}
-        TAG: ${{ github.event.release.tag_name }}
-    - name: "Crosspost changelog to Discord"
-      uses: kludge-cs/gitcord-release-changelogger@v3.0.0
-      with:
-        release-body: ${{ github.event.release.body }}
-        release-name: ${{ steps.get-release-name.outputs.name }}
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Sending message
+        uses: nhevia/discord-styled-releases@main
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
